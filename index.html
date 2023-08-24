@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary px-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">CRUD Agenda</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="./index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./backoffice.html">Backoffice</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 mt-4">
+                <h2 class="display-4">Eventi in calendario</h2>
+                <ul id="currentEvents" class="list-group">
+                    <!-- riceveremo gli eventi ricavati dalle API -->
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+    <script>
+
+        const URL = "https://striveschool-api.herokuapp.com/api/agenda/"
+
+        const getData = async () => {
+
+            try {
+                const ul = document.getElementById("currentEvents")
+                // ogni linea verrà valutata in sequenza dall'alto verso il basso, 
+                // con l'eccezione di quando si incontrerà la keyword "await"
+
+                const resp = await fetch(URL)
+                // la keyword await, in un contesto di funzione async, è in grado di congelare l'esecuzione del codice su quell'operazione fino a compimento
+                console.log(resp)
+                if (!resp.ok) {
+
+                    if (resp.status === 404) {
+                        throw new Error("Not Found 404")
+                    }
+                    if (resp.status === 401) {
+                        throw new Error("Not Permitted")
+                    }
+                    if (resp.status === 500) {
+                        throw new Error("General Server Error")
+                    }
+                }
+
+                const events = await resp.json()
+                console.log(events)
+
+                events.forEach(event => {
+                    ul.innerHTML += `<li class="list-group-item d-flex align-items-center"><span class="me-auto">${event.name}</span> <span class="badge bg-dark me-2">${event.price}€</span> <a href="./details.html?eventId=${event._id}">DETTAGLI</a></li>`
+                })
+            } catch (error) {
+                console.log(error.message)
+            }
+
+            console.log("LAST on getData")
+        }
+
+        const getResource = async () => {
+            try {
+                const resp2 = await fetch(URL + "/64a682e4da53c10014a9688a")
+                console.log(resp2)
+            } catch (error) {
+                console.log(error)
+            }
+
+        }
+
+        window.onload = () => {
+            // const ul = document.getElementById("currentEvents")
+
+            // fetch(URL)
+            //     .then(resp => resp.json())
+            //     .then(events => {
+            //         console.log(events)
+
+            //         events.forEach(event => {
+            //             ul.innerHTML += `<li class="list-group-item d-flex justify-content-between align-items-center"><span>${event.name}</span> <span class="badge bg-dark">${event.price}</span></li>`
+            //         })
+
+            //         // ul.innerHTML = events.map(event => `<li class="list-group-item d-flex justify-content-between align-items-center"><span>${event.name}</span> <span class="badge bg-dark">${event.price}</span></li>`).join("")
+
+            //     })
+            //     .catch(err => console.log(err))
+            getData()
+
+            // fetch(URL + "/64a682e4da53c10014a9688a")
+            // console.log("LAST LOG")
+            // Promise.all([getData(), getResource()]).catch(err => console.log(err))
+        }
+
+    </script>
+</body>
+
+</html>
